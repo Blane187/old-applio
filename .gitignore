@@ -4,8 +4,8 @@ ffprobe.exe
 runtime
 env/
 torchcrepe
-datasets/
-logs/
+
+
 
 assets/audios/
 assets/rmvpe/rmvpe.pt
