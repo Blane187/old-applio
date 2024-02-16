@@ -185,8 +185,6 @@ class Acayun(Base):
             button_small_text_size='*text_md',
             button_small_text_weight='400',
             button_transition='background-color 0.2s ease',
-            chatbot_code_background_color='#000000',
-            chatbot_code_background_color_dark='#000000',
             checkbox_background_color='#25212e',
             checkbox_background_color_dark='#25212e',
             checkbox_background_color_focus='#25212e',
