@@ -12,7 +12,9 @@ from torch.nn.utils import remove_weight_norm, spectral_norm, weight_norm
 
 from lib.modules.infer.infer_pack import attentions, commons, modules
 from lib.modules.infer.infer_pack.commons import get_padding, init_weights
+
 has_xpu = bool(hasattr(torch, "xpu") and torch.xpu.is_available())
+
 
 class TextEncoder256(nn.Module):
     def __init__(
@@ -335,13 +337,17 @@ class SineGen(torch.nn.Module):
                 f0_buf[:, :, idx + 1] = f0_buf[:, :, 0] * (
                     idx + 2
                 )  # idx + 2: the (idx+1)-th overtone, (idx+2)-th harmonic
-            rad_values = (f0_buf / self.sampling_rate) % 1  ###%1意味着n_har的乘积无法后处理优化
+            rad_values = (
+                f0_buf / self.sampling_rate
+            ) % 1  ###%1意味着n_har的乘积无法后处理优化
             rand_ini = torch.rand(
                 f0_buf.shape[0], f0_buf.shape[2], device=f0_buf.device
             )
             rand_ini[:, 0] = 0
             rad_values[:, 0, :] = rad_values[:, 0, :] + rand_ini
-            tmp_over_one = torch.cumsum(rad_values, 1)  # % 1  #####%1意味着后面的cumsum无法再优化
+            tmp_over_one = torch.cumsum(
+                rad_values, 1
+            )  # % 1  #####%1意味着后面的cumsum无法再优化
             tmp_over_one *= upp
             tmp_over_one = F.interpolate(
                 tmp_over_one.transpose(2, 1),
@@ -562,7 +568,7 @@ class SynthesizerTrnMs256NSFsid(nn.Module):
         **kwargs
     ):
         super().__init__()
-        if isinstance(sr,str):
+        if isinstance(sr, str):
             sr = sr2sr[sr]
         self.spec_channels = spec_channels
         self.inter_channels = inter_channels
@@ -645,11 +651,19 @@ class SynthesizerTrnMs256NSFsid(nn.Module):
         o = self.dec(z_slice, pitchf, g=g)
         return o, ids_slice, x_mask, y_mask, (z, z_p, m_p, logs_p, m_q, logs_q)
 
-    def infer(self, phone, phone_lengths, pitch, nsff0, sid, rate:torch.Tensor=torch.FloatTensor([1.0])):
+    def infer(
+        self,
+        phone,
+        phone_lengths,
+        pitch,
+        nsff0,
+        sid,
+        rate: torch.Tensor = torch.FloatTensor([1.0]),
+    ):
         g = self.emb_g(sid).unsqueeze(-1)
         m_p, logs_p, x_mask = self.enc_p(phone, pitch, phone_lengths)
         z_p = (m_p + torch.exp(logs_p) * torch.randn_like(m_p) * 0.66666) * x_mask
-        head = int(z_p.shape[2] * (1.0-rate.item()))
+        head = int(z_p.shape[2] * (1.0 - rate.item()))
         z_p = z_p[:, :, head:]
         x_mask = x_mask[:, :, head:]
         nsff0 = nsff0[:, head:]
@@ -682,7 +696,7 @@ class SynthesizerTrnMs768NSFsid(nn.Module):
         **kwargs
     ):
         super().__init__()
-        if isinstance(sr,str):
+        if isinstance(sr, str):
             sr = sr2sr[sr]
         self.spec_channels = spec_channels
         self.inter_channels = inter_channels
@@ -765,11 +779,19 @@ class SynthesizerTrnMs768NSFsid(nn.Module):
         o = self.dec(z_slice, pitchf, g=g)
         return o, ids_slice, x_mask, y_mask, (z, z_p, m_p, logs_p, m_q, logs_q)
 
-    def infer(self, phone, phone_lengths, pitch, nsff0, sid, rate:torch.Tensor=torch.FloatTensor([1.0])):
+    def infer(
+        self,
+        phone,
+        phone_lengths,
+        pitch,
+        nsff0,
+        sid,
+        rate: torch.Tensor = torch.FloatTensor([1.0]),
+    ):
         g = self.emb_g(sid).unsqueeze(-1)
         m_p, logs_p, x_mask = self.enc_p(phone, pitch, phone_lengths)
         z_p = (m_p + torch.exp(logs_p) * torch.randn_like(m_p) * 0.66666) * x_mask
-        head = int(z_p.shape[2] * (1.0-rate.item()))
+        head = int(z_p.shape[2] * (1.0 - rate.item()))
         z_p = z_p[:, :, head:]
         x_mask = x_mask[:, :, head:]
         nsff0 = nsff0[:, head:]
@@ -876,12 +898,14 @@ class SynthesizerTrnMs256NSFsid_nono(nn.Module):
         o = self.dec(z_slice, g=g)
         return o, ids_slice, x_mask, y_mask, (z, z_p, m_p, logs_p, m_q, logs_q)
 
-    def infer(self, phone, phone_lengths, sid, rate:torch.Tensor=torch.FloatTensor([1.0])):
+    def infer(
+        self, phone, phone_lengths, sid, rate: torch.Tensor = torch.FloatTensor([1.0])
+    ):
         g = self.emb_g(sid).unsqueeze(-1)
         m_p, logs_p, x_mask = self.enc_p(phone, None, phone_lengths)
         z_p = (m_p + torch.exp(logs_p) * torch.randn_like(m_p) * 0.66666) * x_mask
         rate
-        head = int(z_p.shape[2] * (1.0-rate.item()))
+        head = int(z_p.shape[2] * (1.0 - rate.item()))
         z_p = z_p[:, :, head:]
         x_mask = x_mask[:, :, head:]
         nsff0 = nsff0[:, head:]
@@ -988,12 +1012,14 @@ class SynthesizerTrnMs768NSFsid_nono(nn.Module):
         o = self.dec(z_slice, g=g)
         return o, ids_slice, x_mask, y_mask, (z, z_p, m_p, logs_p, m_q, logs_q)
 
-    def infer(self, phone, phone_lengths, sid, rate:torch.Tensor=torch.FloatTensor([1.0])):
+    def infer(
+        self, phone, phone_lengths, sid, rate: torch.Tensor = torch.FloatTensor([1.0])
+    ):
         g = self.emb_g(sid).unsqueeze(-1)
         m_p, logs_p, x_mask = self.enc_p(phone, None, phone_lengths)
         z_p = (m_p + torch.exp(logs_p) * torch.randn_like(m_p) * 0.66666) * x_mask
         rate
-        head = int(z_p.shape[2] * (1.0-rate.item()))
+        head = int(z_p.shape[2] * (1.0 - rate.item()))
         z_p = z_p[:, :, head:]
         x_mask = x_mask[:, :, head:]
         nsff0 = nsff0[:, head:]
@@ -1157,7 +1183,9 @@ class DiscriminatorP(torch.nn.Module):
         if t % self.period != 0:  # pad first
             n_pad = self.period - (t % self.period)
             if has_xpu and x.dtype == torch.bfloat16:
-                x = F.pad(x.to(dtype=torch.float16), (0, n_pad), "reflect").to(dtype=torch.bfloat16)
+                x = F.pad(x.to(dtype=torch.float16), (0, n_pad), "reflect").to(
+                    dtype=torch.bfloat16
+                )
             else:
                 x = F.pad(x, (0, n_pad), "reflect")
             t = t + n_pad
