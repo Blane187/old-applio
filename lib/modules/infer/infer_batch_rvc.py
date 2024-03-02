@@ -4,6 +4,7 @@ runtime\python.exe myinfer-v2-0528.py 0 "E:\codes\py39\RVC-beta\todo-songs" "E:\
 v2
 runtime\python.exe myinfer-v2-0528.py 0 "E:\codes\py39\RVC-beta\todo-songs" "E:\codes\py39\test-20230416b\logs\mi-test-v2\aadded_IVF677_Flat_nprobe_1_v2.index" harvest "E:\codes\py39\RVC-beta\output_v2" "E:\codes\py39\test-20230416b\weights\mi-test-v2.pth" 0.66 cuda:0 True 3 0 1 0.33
 """
+
 import os, sys
 
 now_dir = os.getcwd()
@@ -34,7 +35,9 @@ class Config:
                 or "1070" in self.gpu_name
                 or "1080" in self.gpu_name
             ):
-                print("16-series/10-series graphics cards and P40 forced single precision.")
+                print(
+                    "16-series/10-series graphics cards and P40 forced single precision."
+                )
                 self.is_half = False
                 for config_file in ["32k.json", "40k.json", "48k.json"]:
                     with open(f"assets/configs/{config_file}", "r") as f:
@@ -192,7 +195,9 @@ def get_vc(model_path):
         else:
             net_g = SynthesizerTrnMs768NSFsid_nono(*cpt["config"])
     del net_g.enc_q
-    print(net_g.load_state_dict(cpt["weight"], strict=False))  # 不加这一行清不干净，真奇葩
+    print(
+        net_g.load_state_dict(cpt["weight"], strict=False)
+    )  # 不加这一行清不干净，真奇葩
     net_g.eval().to(device)
     if is_half:
         net_g = net_g.half()

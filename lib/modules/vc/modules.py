@@ -82,21 +82,23 @@ class VC:
 
         to_return_protect0 = {
             "visible": self.if_f0 != 0,
-            "value": to_return_protect[0]
-            if self.if_f0 != 0 and to_return_protect
-            else 0.5,
+            "value": (
+                to_return_protect[0] if self.if_f0 != 0 and to_return_protect else 0.5
+            ),
             "__type__": "update",
         }
         to_return_protect1 = {
             "visible": self.if_f0 != 0,
-            "value": to_return_protect[1]
-            if self.if_f0 != 0 and to_return_protect
-            else 0.33,
+            "value": (
+                to_return_protect[1] if self.if_f0 != 0 and to_return_protect else 0.33
+            ),
             "__type__": "update",
         }
 
         if sid == "" or sid == []:
-            if self.hubert_model is not None:  # 考虑到轮询, 需要加个判断看是否 sid 是由有模型切换到无模型的
+            if (
+                self.hubert_model is not None
+            ):  # 考虑到轮询, 需要加个判断看是否 sid 是由有模型切换到无模型的
                 logger.info("Clean model cache")
                 del (
                     self.net_g,
@@ -105,9 +107,9 @@ class VC:
                     self.hubert_model,
                     self.tgt_sr,
                 )  # ,cpt
-                self.hubert_model = (
-                    self.net_g
-                ) = self.n_spk = self.vc = self.hubert_model = self.tgt_sr = None
+                self.hubert_model = self.net_g = self.n_spk = self.vc = (
+                    self.hubert_model
+                ) = self.tgt_sr = None
                 if torch.cuda.is_available():
                     torch.cuda.empty_cache()
                 ###楼下不这么折腾清理不干净
@@ -215,8 +217,9 @@ class VC:
             self.device = self.instead = "cpu"
             print("Using Forced CPU")
         else:
-            self.device = self.instead = "cuda:0" if torch.cuda.is_available() else "cpu"
-            
+            self.device = self.instead = (
+                "cuda:0" if torch.cuda.is_available() else "cpu"
+            )
 
         global total_time
         total_time = 0

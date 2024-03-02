@@ -116,7 +116,7 @@ except Exception as e:
     except Exception as e:
         logger.error("Failed to start the Flask server")
         logger.error(e)
-        
+
 os.makedirs(tmp, exist_ok=True)
 os.makedirs(os.path.join(now_dir, "logs"), exist_ok=True)
 os.makedirs(os.path.join(now_dir, "logs/weights"), exist_ok=True)
@@ -138,9 +138,11 @@ try:
         "lib/csvdb/formanting.csv", "r", "formanting"
     )
     DoFormant = (
-        lambda DoFormant: True
-        if DoFormant.lower() == "true"
-        else (False if DoFormant.lower() == "false" else DoFormant)
+        lambda DoFormant: (
+            True
+            if DoFormant.lower() == "true"
+            else (False if DoFormant.lower() == "false" else DoFormant)
+        )
     )(DoFormant)
 except (ValueError, TypeError, IndexError):
     DoFormant, Quefrency, Timbre = False, 1.0, 1.0
@@ -992,12 +994,16 @@ def get_pretrained_models(path_str, f0_str, sr2):
             sr2,
         )
     return (
-        "assets/pretrained%s/%sG%s.pth" % (path_str, f0_str, sr2)
-        if if_pretrained_generator_exist
-        else "",
-        "assets/pretrained%s/%sD%s.pth" % (path_str, f0_str, sr2)
-        if if_pretrained_discriminator_exist
-        else "",
+        (
+            "assets/pretrained%s/%sG%s.pth" % (path_str, f0_str, sr2)
+            if if_pretrained_generator_exist
+            else ""
+        ),
+        (
+            "assets/pretrained%s/%sD%s.pth" % (path_str, f0_str, sr2)
+            if if_pretrained_discriminator_exist
+            else ""
+        ),
     )
 
 
@@ -1179,15 +1185,22 @@ def click_train(
             1 if if_cache_gpu17 == True else 0,
             1 if if_save_every_weights18 == True else 0,
             version19,
-            ("-sof %s -sm %s" % (1 if if_stop_on_fit21 == True else 0, smoothness22))
-            if if_stop_on_fit21
-            else "",
             (
-                "-rc %s -ct %s"
-                % (1 if if_retrain_collapse20 == True else 0, collapse_threshold23)
-            )
-            if if_retrain_collapse20
-            else "",
+                (
+                    "-sof %s -sm %s"
+                    % (1 if if_stop_on_fit21 == True else 0, smoothness22)
+                )
+                if if_stop_on_fit21
+                else ""
+            ),
+            (
+                (
+                    "-rc %s -ct %s"
+                    % (1 if if_retrain_collapse20 == True else 0, collapse_threshold23)
+                )
+                if if_retrain_collapse20
+                else ""
+            ),
         )
     )
     logger.info(cmd)
@@ -1963,25 +1976,27 @@ def GradioSetup():
                                     label=i18n(
                                         "Select the pitch extraction algorithm:"
                                     ),
-                                    choices=[
-                                        "pm",
-                                        "harvest",
-                                        "dio",
-                                        "crepe",
-                                        "crepe-tiny",
-                                        "mangio-crepe",
-                                        "mangio-crepe-tiny",
-                                        "rmvpe",
-                                        "rmvpe+",
-                                    ]
-                                    if config.dml == False
-                                    else [
-                                        "pm",
-                                        "harvest",
-                                        "dio",
-                                        "rmvpe",
-                                        "rmvpe+",
-                                    ],
+                                    choices=(
+                                        [
+                                            "pm",
+                                            "harvest",
+                                            "dio",
+                                            "crepe",
+                                            "crepe-tiny",
+                                            "mangio-crepe",
+                                            "mangio-crepe-tiny",
+                                            "rmvpe",
+                                            "rmvpe+",
+                                        ]
+                                        if config.dml == False
+                                        else [
+                                            "pm",
+                                            "harvest",
+                                            "dio",
+                                            "rmvpe",
+                                            "rmvpe+",
+                                        ]
+                                    ),
                                     value="rmvpe+",
                                     interactive=True,
                                 )
@@ -2351,23 +2366,25 @@ def GradioSetup():
                                             label=i18n(
                                                 "Select the pitch extraction algorithm:"
                                             ),
-                                            choices=[
-                                                "pm",
-                                                "harvest",
-                                                "dio",
-                                                "crepe",
-                                                "crepe-tiny",
-                                                "mangio-crepe",
-                                                "mangio-crepe-tiny",
-                                                "rmvpe",
-                                            ]
-                                            if config.dml == False
-                                            else [
-                                                "pm",
-                                                "harvest",
-                                                "dio",
-                                                "rmvpe",
-                                            ],
+                                            choices=(
+                                                [
+                                                    "pm",
+                                                    "harvest",
+                                                    "dio",
+                                                    "crepe",
+                                                    "crepe-tiny",
+                                                    "mangio-crepe",
+                                                    "mangio-crepe-tiny",
+                                                    "rmvpe",
+                                                ]
+                                                if config.dml == False
+                                                else [
+                                                    "pm",
+                                                    "harvest",
+                                                    "dio",
+                                                    "rmvpe",
+                                                ]
+                                            ),
                                             value="rmvpe",
                                             interactive=True,
                                         )
@@ -2591,23 +2608,25 @@ def GradioSetup():
                         with gr.Column():
                             f0method8 = gr.Radio(
                                 label=i18n("Select the pitch extraction algorithm:"),
-                                choices=[
-                                    "pm",
-                                    "harvest",
-                                    "dio",
-                                    "crepe",
-                                    "mangio-crepe",
-                                    "rmvpe",
-                                    "rmvpe_gpu",
-                                ]
-                                if config.dml == False
-                                else [
-                                    "pm",
-                                    "harvest",
-                                    "dio",
-                                    "rmvpe",
-                                    "rmvpe_gpu",
-                                ],
+                                choices=(
+                                    [
+                                        "pm",
+                                        "harvest",
+                                        "dio",
+                                        "crepe",
+                                        "mangio-crepe",
+                                        "rmvpe",
+                                        "rmvpe_gpu",
+                                    ]
+                                    if config.dml == False
+                                    else [
+                                        "pm",
+                                        "harvest",
+                                        "dio",
+                                        "rmvpe",
+                                        "rmvpe_gpu",
+                                    ]
+                                ),
                                 value="rmvpe",
                                 interactive=True,
                             )
