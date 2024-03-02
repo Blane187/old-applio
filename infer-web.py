@@ -1871,7 +1871,7 @@ else:
 def GradioSetup():
     default_weight = ""
 
-    with gr.Blocks(theme=my_applio, title="Applio-RVC-Fork") as app:
+    with gr.Blocks(theme='Hev832/EasyAndCool', title="Applio-RVC-Fork") as app:
         gr.HTML("<h1> 🍏 Applio-RVC-Fork </h1>")
         gr.HTML(
             "<h3>Discover over 15,000 voice models with our Discord bot — <a href='https://bot.applio.org'>Invite it here!</a></h3>"
